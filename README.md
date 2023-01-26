@@ -3,7 +3,9 @@
 This repo is the PyTorch implementation of our ACM Multimedia'22 paper on [Robust Multimodal Depth Estimation using Transformer based Generative Adversarial Networks](https://dl.acm.org/doi/abs/10.1145/3503161.3548418)
 
 <p align="center">
-	<img src="misc/teapot.png" alt="photo not available">
+	<img src="misc/teapot.png" 
+    width = "400"
+    alt="photo not available">
 </p>
 
 ## Requirements
