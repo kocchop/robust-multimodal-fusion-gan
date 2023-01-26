@@ -63,6 +63,7 @@ def getOpt():
     parser.add_argument("--model", type=str, default="nyu_modelA", required = True, help="name of the model (nyu_modelA | nyu_modelB)")
     parser.add_argument("--dataset_path", type=str, default="/home/mdl/mzk591/dataset/data.nyuv2/disk3/", help="path to the dataset")
     parser.add_argument("--batch_size", type=int, default=4, help="size of the batches")
+    parser.add_argument('--robust', '-r', action='store_true', help="flag to enable robust training")
     parser.add_argument("--save_size", type=int, default=8, help="batch size for saved outputs")
     parser.add_argument("--n_cpu", type=int, default=16, help="number of cpu threads to use during batch generation")
     parser.add_argument("--channels", type=int, default=1, help="number of image channels")
@@ -79,9 +80,21 @@ def getOpt():
 def validate(generator, discriminator, opt, Tensor, val_dataloader, criterion_GAN, criterion_content, criterion_pixel, logger, val_image_save_path, writer, batches_done=0):
     
     total_val_batches = len(val_dataloader)
-    
-    batch_to_be_saved = np.random.randint(total_val_batches, size=5)
-    # batch_to_be_saved = [1, 2, 3, 4] #it can be any numbers
+
+    if opt.robust:
+        # Finding noisy batches
+        val_rgb_noise, val_sparse_noise = send_noisy_batches(total_val_batches, train_flag=False)
+
+        logger.info("RGB noisy batches for validation are: {}".format(val_rgb_noise))
+        logger.info("Sparse noisy batches for validation are: {}".format(val_sparse_noise))
+
+        batch_to_be_saved = np.random.randint(total_val_batches, size=3)
+        batch_to_be_saved = set(batch_to_be_saved)
+        batch_to_be_saved.add(val_rgb_noise[0])
+        batch_to_be_saved.add(val_sparse_noise[0])
+    else:  
+        batch_to_be_saved = np.random.randint(total_val_batches, size=5)
+        # batch_to_be_saved = [1, 2, 3, 4] #it can be any numbers
     
     val_sample_path = os.path.join(val_image_save_path,"%06d"%batches_done)
     os.makedirs(val_sample_path, exist_ok=True)
@@ -94,6 +107,14 @@ def validate(generator, discriminator, opt, Tensor, val_dataloader, criterion_GA
         sparse_temp = torch.unsqueeze(imgs["sparse"], 1)
         gt_temp = torch.unsqueeze(imgs["gt"], 1)
         rgb_temp = imgs["rgb"]
+
+        if opt.robust:
+            if (i in val_rgb_noise):
+                rgb_temp = torch.zeros(rgb_temp.size()) # it can be any other noise
+                logger.info("Current batch {} is a noisy RGB sample!".format(i+1))
+            elif (i in val_sparse_noise):
+                sparse_temp = torch.zeros(sparse_temp.size()) # it can be any other form of noise
+                logger.info("Current batch {} is a noisy sparse sample!".format(i+1))
         
         # Configure model input
         sparse_depth = Variable(sparse_temp.type(Tensor))

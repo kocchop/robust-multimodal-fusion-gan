@@ -6,6 +6,7 @@ import numpy as np
 import os
 from torchvision.utils import make_grid
 from torchvision import transforms
+from numpy.random import default_rng
 
 import logging
 import cv2
@@ -36,7 +37,12 @@ def generate_depth_cmap(in_tensor):
     for img in range(depth_tensor.shape[0]):
         min_val = np.amin(depth_tensor[img])
         max_val = np.amax(depth_tensor[img])
-        gray = (depth_tensor[img]-min_val)/(max_val-min_val)
+
+        if (max_val - min_val) < 1e-4: # when they are pretty close, no normalization
+            gray = depth_tensor[img]
+        else:
+            gray = (depth_tensor[img]-min_val)/(max_val-min_val)
+        
         # gray = depth_tensor[img]/255.0
         gray = np.clip(gray,0,1)
         heatmap = np.round(colormap(gray) * 255).astype(np.uint8)[:,:,:3]
@@ -121,18 +127,44 @@ def save_my_image(image_array, fp) -> None:
     # print('image_array',image_array.shape)
     cv2.imwrite(fp, image_array)
 
-def save_sample_images(gt_depth, imgs_rgb, sparse_depth, gen_depth, image_save_path, image_id) -> None:
+def save_sample_images(gt_depth, imgs_rgb, sparse_depth, gen_depth, image_save_path, image_id, sn_flag=False, rn_flag=False) -> None:
 
     denorm_gt = denormalize_dense(gt_depth)
-    denorm_sparse = denormalize_sparse(sparse_depth)
+
+    if sn_flag:
+        denorm_sparse = sparse_depth
+    else:
+        denorm_sparse = denormalize_sparse(sparse_depth)
+    
     denorm_pred = denormalize_dense(gen_depth)
 
     gt_depth = generate_depth_cmap(denorm_gt)
     sparse_depth = generate_depth_cmap(denorm_sparse)
     gen_depth = generate_depth_cmap(denorm_pred)
 
-    imgs_rgb = denormalize_rgb(imgs_rgb).permute(0,2,3,1).to('cpu').detach().numpy()
+    if rn_flag:
+        imgs_rgb = imgs_rgb.permute(0,2,3,1).to('cpu').detach().numpy()
+    else:
+        imgs_rgb = denormalize_rgb(imgs_rgb).permute(0,2,3,1).to('cpu').detach().numpy()
  
     img_grid = np.concatenate((gt_depth, imgs_rgb, sparse_depth, gen_depth), axis=2)
     saved_image_file = os.path.join(image_save_path,"%04d.png"%image_id)
     save_my_image(img_grid, saved_image_file)
+
+def send_noisy_batches(batches, train_flag=False, ratio=0.2):
+
+    n_noisy_batches = round(batches * ratio)
+    n_rgb = round(n_noisy_batches * 0.5)
+
+    rng = default_rng()
+    
+    if train_flag:
+        allowed = np.arange(batches + 1)
+        selection = rng.choice(allowed, size=n_noisy_batches, replace=False)
+    else:
+        selection = rng.choice(batches+1, size=n_noisy_batches, replace=False)
+
+    rgb_batches = selection[:n_rgb]
+    sparse_batches = selection[n_rgb:]
+
+    return sorted(rgb_batches), sorted(sparse_batches)

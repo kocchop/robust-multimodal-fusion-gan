@@ -72,6 +72,7 @@ def getOpt():
     parser.add_argument("--model", type=str, default="nyu_modelA", required = True, help="name of the model (nyu_modelA | nyu_modelB)")
     parser.add_argument("--dataset_path", type=str, default="/home/mdl/mzk591/dataset/data.nyuv2/disk3/", help="path to the dataset")
     parser.add_argument("--batch_size", type=int, default=16, help="size of the batches")
+    parser.add_argument('--robust', '-r', action='store_true', help="flag to enable robust training")
     parser.add_argument("--save_size", type=int, default=8, help="batch size for saved outputs")
     parser.add_argument("--lr", type=float, default=0.0002, help="adam: learning rate")
     parser.add_argument("--b1", type=float, default=0.9, help="adam: decay of first order momentum of gradient")
@@ -217,6 +218,14 @@ def main():
     # snapshot_interval = round(total_train_batches/2)
     snapshot_interval = 30
     
+
+    if opt.robust:
+        # Finding noisy batches
+        train_rgb_noise, train_sparse_noise = send_noisy_batches(total_train_batches, train_flag=True)
+
+        logger.info("RGB noisy batches for training are: {}".format(train_rgb_noise))
+        logger.info("Sparse noisy batches for training are: {}".format(train_sparse_noise))
+
     # ----------
     #  Training
     # ----------
@@ -237,6 +246,19 @@ def main():
             sparse_temp = torch.unsqueeze(imgs["sparse"], 1)
             gt_temp = torch.unsqueeze(imgs["gt"], 1)
             rgb_temp = imgs["rgb"]
+            
+            if opt.robust:
+                # do not want to start the training during warm up
+                rstart = False
+                if batches_done >= opt.warmup_batches:
+                    rstart = True 
+                    
+                if (i in train_rgb_noise) and rstart:
+                    rgb_temp = torch.zeros(rgb_temp.size()) # it can be any other noise
+                    logger.info("Current batch {} is a noisy RGB sample!".format(batches_done))
+                elif (i in train_sparse_noise) and rstart:
+                    sparse_temp = torch.zeros(sparse_temp.size()) # it can be any other form of noise
+                    logger.info("Current batch {} is a noisy sparse sample!".format(batches_done))
             
             # Configure model input
             sparse_depth = Variable(sparse_temp.type(Tensor))
