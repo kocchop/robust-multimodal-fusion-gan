@@ -1,0 +1,15 @@
+#temp files
+.nfs*
+
+#cache files
+__pycache__
+*.pyc
+
+#saved models
+*.pth
+
+#log dirs
+logdir/*
+
+#Checkpoint dir
+chkpts/*
