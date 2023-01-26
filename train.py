@@ -70,7 +70,7 @@ def getOpt():
     parser.add_argument("--n_epochs", type=int, default=10, help="number of epochs of training")
     parser.add_argument("--dataset", type=str, default="nyu_v2", help="name of the dataset (shapeNet or nyu_v2)")
     parser.add_argument("--model", type=str, default="nyu_modelA", required = True, help="name of the model (nyu_modelA | nyu_modelB)")
-    parser.add_argument("--dataset_path", type=str, default="/home/mdl/mzk591/dataset/data.nyuv2/disk3/", help="path to the dataset")
+    parser.add_argument("--dataset_path", type=str, default="/home/dataset/nyu_v2/", help="path to the dataset")
     parser.add_argument("--batch_size", type=int, default=16, help="size of the batches")
     parser.add_argument('--robust', '-r', action='store_true', help="flag to enable robust training")
     parser.add_argument("--save_size", type=int, default=8, help="batch size for saved outputs")
@@ -83,7 +83,7 @@ def getOpt():
     parser.add_argument("--hr_width", type=int, default=304, help="dense depth width")
     parser.add_argument("--channels", type=int, default=1, help="depth image has only 1 channel")
     parser.add_argument("--sample_interval", type=int, default=20, help="interval between saving image samples")
-    parser.add_argument("--warmup_batches", type=int, default=15, help="number of batches with pixel-wise loss only")
+    parser.add_argument("--warmup_batches", type=int, default=250, help="number of batches with pixel-wise loss only")
     parser.add_argument("--lambda_adv", type=float, default=5e-3, help="adversarial loss weight")
     parser.add_argument("--lambda_pixel", type=float, default=1e-2, help="pixel-wise loss weight")
     parser.add_argument("--gpus", metavar='DEV_ID', default=None,
@@ -215,9 +215,7 @@ def main():
     milestones = [opt.decay_epoch, opt.decay_epoch + opt.lr_gap, opt.decay_epoch + opt.lr_gap*2, opt.decay_epoch + opt.lr_gap*3]
     
     total_train_batches = len(train_dataloader)
-    # snapshot_interval = round(total_train_batches/2)
-    snapshot_interval = 30
-    
+    snapshot_interval = round(total_train_batches/2)
 
     if opt.robust:
         # Finding noisy batches

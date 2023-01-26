@@ -190,7 +190,7 @@ class PairedImageDataset(Dataset):
         # assumption is that the sparse depth is in "lidar" folder
         #                   ground truth depth is in "depth_gt" folder
         #               and rgb image is in "image_rgb" folder
-        self.gt_folder, self.lq_folder, self.rgb_folder = os.path.join(root,'depth_gt'), os.path.join(root,'lidar_5p'), os.path.join(root,'image_rgb')
+        self.gt_folder, self.lq_folder, self.rgb_folder = os.path.join(root,'depth_gt'), os.path.join(root,'sparse_depth'), os.path.join(root,'image_rgb')
         
         self.filename_tmpl = '{}'
         
