@@ -8,22 +8,22 @@ python validate.py --model nyu_modelA --gpus=0 --batch_size=16 --checkpoint_mode
 2. -n --> give a name to the run
 3. Modify the val dataloader path with appropriate data directory
 4. Typically the directory has the following structure
-   ----|->data.ShapeNetDepth|
-                            |->train|
-                                    |->sparse_depth
-                                    |->depth_gt
-                                    |->image_rgb
-                                    |->meta_info.txt
-                            |->val|
-                                  |->sparse_depth
-                                  |->depth_gt
-                                  |->image_rgb
-                                  |->meta_info.txt
-                            |->sample|
-                                     |->sparse_depth
-                                     |->depth_gt
-                                     |->image_rgb
-                                     |->meta_info.txt
+   ----|->data.nyu_v2|
+                     |->train|
+                             |->sparse_depth
+                             |->depth_gt
+                             |->image_rgb
+                             |->meta_info.txt
+                     |->val|
+                           |->sparse_depth
+                           |->depth_gt
+                           |->image_rgb
+                           |->meta_info.txt
+                     |->sample|
+                              |->sparse_depth
+                              |->depth_gt
+                              |->image_rgb
+                              |->meta_info.txt
 
 5. The "depth_gt" and "lidar" are the folders containing dense and sparse depth respectively
 6. The meta_info.txt contains the file names of these folders. Refer to misc/ folder for sample meta_info file
@@ -66,7 +66,6 @@ def getOpt():
     parser.add_argument("--save_size", type=int, default=8, help="batch size for saved outputs")
     parser.add_argument("--n_cpu", type=int, default=16, help="number of cpu threads to use during batch generation")
     parser.add_argument("--channels", type=int, default=1, help="number of image channels")
-    parser.add_argument("--validation_interval", type=int, default=4000, help="interval between two consecutive validations")
     parser.add_argument("--lambda_adv", type=float, default=5e-3, help="adversarial loss weight")
     parser.add_argument("--lambda_pixel", type=float, default=1e-2, help="pixel-wise loss weight")
     parser.add_argument("--gpus", metavar='DEV_ID', default=None,

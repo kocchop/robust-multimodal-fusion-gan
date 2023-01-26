@@ -14,7 +14,7 @@ import io
 import pathlib
 import matplotlib.pyplot as plt
 
-# nyu_v2 dataset
+# stat for nyu_v2 dataset
 rgb_mean = np.array([0.46797212, 0.39178501, 0.37140868])
 rgb_std = np.array([0.18536709, 0.18698769, 0.19171533])
 

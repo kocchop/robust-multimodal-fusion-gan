@@ -11,22 +11,22 @@ python train.py --model nyu_modelA --gpus=0,1 --batch_size=40 --n_epochs=27 --de
 1. -n --> give a name to the run
 2. Modify the val dataloader path with appropriate data directory
 3. Typically the directory has the following structure
-   ----|->data.ShapeNetDepth|
-                            |->train|
-                                    |->sparse_depth
-                                    |->depth_gt
-                                    |->image_rgb
-                                    |->meta_info.txt
-                            |->val|
-                                  |->sparse_depth
-                                  |->depth_gt
-                                  |->image_rgb
-                                  |->meta_info.txt
-                            |->sample|
-                                     |->sparse_depth
-                                     |->depth_gt
-                                     |->image_rgb
-                                     |->meta_info.txt
+    ----|->data.nyu_v2|
+                      |->train|
+                              |->sparse_depth
+                              |->depth_gt
+                              |->image_rgb
+                              |->meta_info.txt
+                      |->val|
+                            |->sparse_depth
+                            |->depth_gt
+                            |->image_rgb
+                            |->meta_info.txt
+                      |->sample|
+                               |->sparse_depth
+                               |->depth_gt
+                               |->image_rgb
+                               |->meta_info.txt
 
 4. The "depth_gt" and "lidar" are the folders containing dense and sparse depth respectively
 5. The meta_info.txt contains the file names of these folders. Refer to misc/ folder for sample meta_info file
