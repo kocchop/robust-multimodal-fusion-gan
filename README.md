@@ -4,7 +4,7 @@ This repo is the PyTorch implementation of our ACM Multimedia'22 paper on [Robus
 
 <p align="center">
 	<img src="misc/teapot.png" 
-    width = "400"
+    width = "600"
     alt="photo not available">
 </p>
 
@@ -30,6 +30,7 @@ python train.py --model nyu_modelA --gpus=0,1 --batch_size=40 --n_epochs=27 --de
 1. -n --> give a name to the run
 2. Modify the val dataloader path with appropriate data directory
 3. Typically the directory has the following structure
+```
     ----|->data.nyu_v2|
                       |->train|
                               |->sparse_depth
@@ -46,7 +47,7 @@ python train.py --model nyu_modelA --gpus=0,1 --batch_size=40 --n_epochs=27 --de
                                |->depth_gt
                                |->image_rgb
                                |->meta_info.txt
-
+```
 4. The "depth_gt" and "sparse_depth" are the folders containing dense and sparse depth respectively
 5. The meta_info.txt contains the file names of these folders. Refer to misc/ folder for sample meta_info file
 6. The folder "sample" contains a few sparse samples. This is to track the model learning visually. This is optional.
