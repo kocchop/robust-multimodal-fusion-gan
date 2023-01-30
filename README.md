@@ -24,9 +24,9 @@ typing == 3.6.4
 Primarily two datasets were used [ShapeNet](https://shapenet.org/) and [NYU_v2](https://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html)
 
 ## Training
-
+```
 python train.py --model nyu_modelA --gpus=0,1 --batch_size=40 --n_epochs=27 --decay_epoch=15 --lr_gap=3 -p chkpts/nyu_modelA.pth -n nyu_modelA_train
-
+```
 1. -n --> give a name to the run
 2. Modify the val dataloader path with appropriate data directory
 3. Typically the directory has the following structure
